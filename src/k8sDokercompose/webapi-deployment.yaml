@@ -28,7 +28,7 @@ spec:
         - env:
             - name: ConnectionStrings__DefaultConnection
               value: Host=db;Port=5432;Database=MotoFactsDB;Username=postgres;Password=admin
-          image: eddynguyen/motofacts
+          image: 008971674309.dkr.ecr.ap-southeast-1.amazonaws.com/motofacts
           name: webapi
           ports:
             - containerPort: 80
