@@ -1,0 +1,115 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: acr
+- name: tag
+  value: $(Build.BuildId)'
+- name: imagePullSecret
+  value: 'motofacts'
+- name: tag
+  value: '$(Build.BuildId)'
+- name: dockerfile
+  value: '**/Dockerfile'
+
+stages:
+- stage: Build
+  displayName: Build and push stage
+  jobs:  
+  - job: Build
+    displayName: Build
+    steps:
+    - task: MicrosoftSecurityDevOps@1
+      displayName: 'Microsoft Security DevOps'
+      inputs:         
+        break: true  
+    - task: UseDotNet@2
+      inputs:
+        version: '7.0.x'
+        includePreviewVersions: false
+
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: Build
+      inputs:
+        command: build
+        projects: '**/*.csproj'
+        arguments: '--configuration Release'
+
+    - task: DotNetCoreCLI@2
+      displayName: Test
+      inputs:
+        command: test
+        projects: '**/*Tests/*.csproj'
+        arguments: '--configuration Release --collect "Code coverage"'
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: $(acrserviceConnection)
+        repository: 'motofacts'
+        command: 'build'
+        Dockerfile: $(dockerfile)
+        tags: |
+          $(tag)
+    - task: Docker@2
+      inputs:
+        containerRegistry: $(acrserviceConnection)
+        repository: 'motofacts'
+        command: 'push'
+        tags: |
+          $(tag)
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Pipeline.Workspace)'
+        artifact: 'manifests'
+        publishLocation: 'pipeline'
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy api
+    environment: DEV
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              artifactName: 'manifests'
+              downloadPath: '$(System.ArtifactsDirectory)/manifests/s'
+          
+          - task: KubernetesManifest@0
+            displayName: Create imagePullSecret
+            inputs:
+              kubernetesServiceConnection: $(kubernetesConnection)
+              action: createSecret
+              secretName: $(imagePullSecret)
+              namespace: $(k8sNamespace)
+              dockerRegistryEndpoint: $(acrserviceConnection)
+          
+          - task: KubernetesManifest@0
+            displayName: Deploy to Kubernetes cluster
+            inputs:
+              action: deploy
+              namespace: $(k8sNamespace)
+              kubernetesServiceConnection: $(kubernetesConnection)
+              manifests: |
+                $(System.ArtifactsDirectory)/manifests/s/s/src/deployment/webapi-deployment.yaml
+                $(System.ArtifactsDirectory)/manifests/s/s/src/deployment/webapi-service.yaml
+              imagePullSecrets: |
+                $(imagePullSecret)
+              containers: |
+                $(containerRegistry)/$(imagePullSecret):$(tag)

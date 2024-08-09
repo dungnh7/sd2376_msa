@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    environment: DEV
+    app: motofacts
+  name: motofacts-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: motofacts
+  template:
+    metadata:      
+      labels:
+        app: motofacts
+    spec:
+      containers:
+        - env:
+            - name: ConnectionStrings__DefaultConnection
+              value: Data Source=motofact.db
+            - name: JAEGER_SERVICE_NAME
+              value: MotoFacts
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+          image: sd2376acr.azurecr.io/motofacts
+          imagePullPolicy: Always
+          name: motofacts
+          ports:
+            - containerPort: 80
+          resources: {}
+      restartPolicy: Always
+status: {}

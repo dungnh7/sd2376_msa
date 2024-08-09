@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: motofacts-service
+  labels:
+    app: motofacts
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app: motofacts
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
