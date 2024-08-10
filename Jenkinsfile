@@ -26,8 +26,8 @@ pipeline {
             steps {
                 withAWS(region: 'ap-southeast-1', credentials: 'aws-credential') {
                     sh "aws eks update-kubeconfig --name sd2376eks"
-                    sh "kubectl apply -f src/k8sDokercompose/webapi-deployment.yaml"
-                    sh "kubectl apply -f src/k8sDokercompose/webapi-service.yaml"
+                    sh "kubectl apply -f src/deployment/webapi-deployment.yaml"
+                    sh "kubectl apply -f src/deployment/webapi-service.yaml"
                 }
             }
         }
