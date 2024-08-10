@@ -23,7 +23,7 @@ spec:
               value: MotoFacts
             - name: JAEGER_SAMPLER_TYPE
               value: const
-          image: sd2376acr.azurecr.io/motofacts
+          image: 008971674309.dkr.ecr.ap-southeast-1.amazonaws.com/motofacts
           imagePullPolicy: Always
           name: motofacts
           ports:
