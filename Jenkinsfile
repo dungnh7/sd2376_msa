@@ -26,8 +26,24 @@ pipeline {
             steps {
                 withAWS(region: 'ap-southeast-1', credentials: 'aws-credential') {
                     sh "aws eks update-kubeconfig --name sd2376eks"
+                    // Create namespace
+                    sh "kubectl create namespace argocd || echo argocdnamespacealreadyexists"
+                    sh "kubectl create namespace app-argocd || echo appargocdnamespacealreadyexists"
+                    //install argocd
+                    sh "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+                    // Retrieve and decode the Argo CD admin password
+                    sh """
+                        PASSWORD_BASE64=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}')
+                        echo "Decoding password..."
+                        echo \${PASSWORD_BASE64} | base64 --decode
+                       """
+                    //forward port
+                    sh "kubectl port-forward svc/argocd-server -n argocd 8082:443"
+                    //deploy services
                     sh "kubectl apply -f src/deployment/webapi-deployment.yaml"
                     sh "kubectl apply -f src/deployment/webapi-service.yaml"
+                    //run deploy argocd declarative
+                    sh "kubectl apply -f declarative/backend.yaml"
                 }
             }
         }
