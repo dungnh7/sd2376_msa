@@ -44,6 +44,17 @@ pipeline {
                     sh "kubectl apply -f src/deployment/webapi-service.yaml"
                     //run deploy argocd declarative
                     sh "kubectl apply -f declarative/backend.yaml"
+
+                    // Install Prometheus
+                    sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts"
+                    sh "helm repo update"
+                    sh "helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace"
+                    // Install Grafana
+                    sh "helm install grafana grafana/grafana --namespace monitoring --set adminPassword='admin' --set service.type=LoadBalancer"
+
+                    //forward
+                    sh "kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n monitoring"
+                    sh "kubectl port-forward svc/grafana 3000:3000 -n monitoring"
                 }
             }
         }
