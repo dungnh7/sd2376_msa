@@ -1,6 +1,6 @@
 # sd2376_msa
 - Webhook
-- Jenkins
+- Jenkins:
     . Docker Build and push to ECR
     . One time step install argocd
     . Deploy argo declarative file
