@@ -81,7 +81,7 @@ pipeline {
                         if (!namespaceExists) {
                             // Check if Helm is installed and install it if not
                             if (sh(script: "which helm", returnStatus: true) != 0) {
-                                sh 'curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash'
+                                sh 'curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash -s -- --no-sudo'
                                 // Optionally add Helm to the PATH if not automatically available
                                 sh 'export PATH=$PATH:/usr/local/bin'
                             }
