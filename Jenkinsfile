@@ -67,22 +67,24 @@ pipeline {
             agent any
             steps {
                 withAWS(region: "${REGION}" , credentials: 'aws-credential') {
-                    sh "aws eks update-kubeconfig --name ${EKS_NAME}"
-                    def namespaceExists = (sh(script: "kubectl get namespace monitoring", returnStatus: true) == 0)
-                    if (!namespaceExists) {
-                        // Install Prometheus
-                        sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts"
-                        sh "helm repo update"
-                        sh "helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace"
-                        // Install Grafana
-                        sh "helm install grafana grafana/grafana --namespace monitoring --set adminPassword='admin' --set service.type=LoadBalancer"
-
-                        //forward
-                        sh "kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n monitoring"
-                        sh "kubectl port-forward svc/grafana 3000:3000 -n monitoring"
-                    } else {
-                        echo "Prometheus and Grafana is already set up. Skipping one-time setup."
-                    }                    
+                    script {
+                        sh "aws eks update-kubeconfig --name ${EKS_NAME}"
+                        def namespaceExists = (sh(script: "kubectl get namespace monitoring", returnStatus: true) == 0)
+                        if (!namespaceExists) {
+                            // Install Prometheus
+                            sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts"
+                            sh "helm repo update"
+                            sh "helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace"
+                            // Install Grafana
+                            sh "helm install grafana grafana/grafana --namespace monitoring --set adminPassword='admin' --set service.type=LoadBalancer"
+    
+                            //forward
+                            sh "kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n monitoring"
+                            sh "kubectl port-forward svc/grafana 3000:3000 -n monitoring"
+                        } else {
+                            echo "Prometheus and Grafana is already set up. Skipping one-time setup."
+                        }      
+                    }
                 }
             }
         }
