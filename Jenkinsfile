@@ -80,8 +80,10 @@ pipeline {
                         def namespaceExists = (sh(script: "kubectl get namespace monitoring", returnStatus: true) == 0)
                         if (!namespaceExists) {
                             // Check if Helm is installed and install it if not
-                            if (sh(script: 'which helm', returnStatus: true) != 0) {
+                            if (sh(script: "which helm", returnStatus: true) != 0) {
                                 sh 'curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash'
+                                // Optionally add Helm to the PATH if not automatically available
+                                sh 'export PATH=$PATH:/usr/local/bin'
                             }
                             // Install Prometheus
                             sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts"
