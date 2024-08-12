@@ -10,30 +10,6 @@ pipeline {
         EKS_NAME  = "sd2376eks"
     }
     stages {      
-        stage('One-time Setup Argocd') {
-            agent any
-            steps {
-                withAWS(region: "${REGION}", credentials: 'aws-credential') {
-                    script {
-                        sh "aws eks update-kubeconfig --name ${EKS_NAME}"
-                        // Check if ArgoCD namespace exists
-                        def namespaceExists = sh(script: "kubectl get namespace argocd", returnStatus: true) == 0
-                        if (!namespaceExists) {
-                            sh "kubectl create namespace argocd"
-                            sh "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
-                            // Wait for ArgoCD to be ready
-                            sh "kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n argocd"
-                            // Apply ArgoCD application
-                            sh "kubectl create namespace app-argocd"
-                            sh "kubectl apply -f declarative/backend.yaml"
-                        } else {
-                            echo "ArgoCD is already set up. Skipping one-time setup."
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Docker Build and push Backend') {
             agent any
             steps {
@@ -59,6 +35,30 @@ pipeline {
                         git commit -m "Update backend image to ${IMAGE_TAG}" || echo "No changes to commit"
                         git push origin main || echo "No changes to push"
                     """
+                }
+            }
+        }
+
+        stage('One-time Setup Argocd') {
+            agent any
+            steps {
+                withAWS(region: "${REGION}", credentials: 'aws-credential') {
+                    script {
+                        sh "aws eks update-kubeconfig --name ${EKS_NAME}"
+                        // Check if ArgoCD namespace exists
+                        def namespaceExists = sh(script: "kubectl get namespace argocd", returnStatus: true) == 0
+                        if (!namespaceExists) {
+                            sh "kubectl create namespace argocd"
+                            sh "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+                            // Wait for ArgoCD to be ready
+                            sh "kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n argocd"
+                            // Apply ArgoCD application
+                            sh "kubectl create namespace app-argocd"
+                            sh "kubectl apply -f declarative/backend.yaml"
+                        } else {
+                            echo "ArgoCD is already set up. Skipping one-time setup."
+                        }
+                    }
                 }
             }
         }
