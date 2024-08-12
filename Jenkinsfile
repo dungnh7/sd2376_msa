@@ -81,14 +81,17 @@ pipeline {
                         if (!namespaceExists) {
                             // Check if Helm is installed and install it if not
                             if (sh(script: "which helm", returnStatus: true) != 0) {
-                                sh '''
-                                    mkdir -p $HOME/bin
+                                def installDir = '/var/lib/jenkins/bin'
+                                sh "mkdir -p ${installDir}"                                
+                                // Download and run the Helm installation script
+                                sh """
                                     curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
                                     chmod 700 get_helm.sh
-                                    HELM_INSTALL_DIR=$HOME/bin ./get_helm.sh --no-sudo
+                                    HELM_INSTALL_DIR=${installDir} ./get_helm.sh --no-sudo
                                     rm get_helm.sh
-                                    export PATH=$HOME/bin:$PATH
-                                '''
+                                """                                
+                                // Add the installation directory to PATH
+                                env.PATH = "${installDir}:${env.PATH}"                                
                             }
                             // Install Prometheus
                             sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts"
