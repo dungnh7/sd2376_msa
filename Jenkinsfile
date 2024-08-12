@@ -51,7 +51,15 @@ pipeline {
                             sh "kubectl create namespace argocd"
                             sh "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
                             // Wait for ArgoCD to be ready
-                            sh "kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n argocd"
+                            sh "kubectl wait --for=condition=available --timeout=30s deployment/argocd-server -n argocd"
+                            // Retrieve and decode the Argo CD admin password
+                            sh """
+                                PASSWORD_BASE64=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}')
+                                echo "Decoding password..."
+                                echo \${PASSWORD_BASE64} | base64 --decode
+                            """
+                            //forward port
+                            sh "kubectl port-forward svc/argocd-server -n argocd 8082:443"
                             // Apply ArgoCD application
                             sh "kubectl create namespace app-argocd"
                             sh "kubectl apply -f declarative/backend.yaml"
@@ -71,6 +79,10 @@ pipeline {
                         sh "aws eks update-kubeconfig --name ${EKS_NAME}"
                         def namespaceExists = (sh(script: "kubectl get namespace monitoring", returnStatus: true) == 0)
                         if (!namespaceExists) {
+                            // Check if Helm is installed and install it if not
+                            if (sh(script: 'which helm', returnStatus: true) != 0) {
+                                sh 'curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash'
+                            }
                             // Install Prometheus
                             sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts"
                             sh "helm repo update"
