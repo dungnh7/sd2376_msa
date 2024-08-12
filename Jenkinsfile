@@ -13,7 +13,7 @@ pipeline {
         stage('One-time Setup Argocd') {
             agent any
             steps {
-                withAWS(region: ${REGION}, credentials: 'aws-credential') {
+                withAWS(region: "${REGION}", credentials: 'aws-credential') {
                     script {
                         sh "aws eks update-kubeconfig --name ${EKS_NAME}"
                         // Check if ArgoCD namespace exists
@@ -37,7 +37,7 @@ pipeline {
         stage('Docker Build and push Backend') {
             agent any
             steps {
-                withAWS(region:${REGION},credentials:'aws-credential') {
+                withAWS(region:"${REGION}",credentials:'aws-credential') {
                     sh "aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_URI}"
                     sh "docker build -t ${BACKEND_APP}:${IMAGE_TAG} src/"
                     sh "docker tag ${BACKEND_APP}:${IMAGE_TAG} ${ECR_URI}/${BACKEND_APP}:${IMAGE_TAG}"
@@ -49,7 +49,7 @@ pipeline {
         stage('Update Kubernetes Deployment') {
             agent any
             steps {
-                withAWS(region: ${REGION}, credentials: 'aws-credential') {
+                withAWS(region: "${REGION}", credentials: 'aws-credential') {
                     // Update the Kubernetes deployment file with the new image tag
                     sh """
                         sed -i 's|image: ${ECR_URI}/${BACKEND_APP}:.*|image: ${ECR_URI}/${BACKEND_APP}:${IMAGE_TAG}|' src/deployment/webapi-deployment.yaml
@@ -66,7 +66,7 @@ pipeline {
         stage('One-time Setup Prometheus and Grafana') {
             agent any
             steps {
-                withAWS(region: ${REGION} , credentials: 'aws-credential') {
+                withAWS(region: "${REGION}" , credentials: 'aws-credential') {
                     sh "aws eks update-kubeconfig --name ${EKS_NAME}"
                     def namespaceExists = sh(script: "kubectl get namespace monitoring", returnStatus: true) == 0
                     if (!namespaceExists) {
