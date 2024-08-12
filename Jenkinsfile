@@ -51,7 +51,7 @@ pipeline {
                             sh "kubectl create namespace argocd"
                             sh "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
                             // Wait for ArgoCD to be ready
-                            sh "kubectl wait --for=condition=available --timeout=30s deployment/argocd-server -n argocd"
+                            //sh "kubectl wait --for=condition=available --timeout=30s deployment/argocd-server -n argocd"
                             // Retrieve and decode the Argo CD admin password
                             sh """
                                 PASSWORD_BASE64=\$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}')
