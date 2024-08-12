@@ -54,7 +54,7 @@ pipeline {
                             sh "kubectl wait --for=condition=available --timeout=30s deployment/argocd-server -n argocd"
                             // Retrieve and decode the Argo CD admin password
                             sh """
-                                PASSWORD_BASE64=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}')
+                                PASSWORD_BASE64=\$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}')
                                 echo "Decoding password..."
                                 echo \${PASSWORD_BASE64} | base64 --decode
                             """
