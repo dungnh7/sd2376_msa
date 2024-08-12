@@ -59,7 +59,7 @@ pipeline {
                                 echo \${PASSWORD_BASE64} | base64 --decode
                             """
                             //forward port
-                            sh "kubectl port-forward svc/argocd-server -n argocd 8082:443"
+                            //sh "kubectl port-forward svc/argocd-server -n argocd 8082:443"
                             // Apply ArgoCD application
                             sh "kubectl create namespace app-argocd"
                             sh "kubectl apply -f declarative/backend.yaml"
