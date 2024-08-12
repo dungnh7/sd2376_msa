@@ -81,9 +81,8 @@ pipeline {
                         if (!namespaceExists) {
                             // Check if Helm is installed and install it if not
                             if (sh(script: "which helm", returnStatus: true) != 0) {
-                                sh 'curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash -s -- --no-sudo'
-                                // Optionally add Helm to the PATH if not automatically available
-                                sh 'export PATH=$PATH:/usr/local/bin'
+                                sh 'curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | HELM_INSTALL_DIR=$HOME/bin bash -s -- --no-sudo'
+                                sh 'export PATH=$PATH:$HOME/bin'
                             }
                             // Install Prometheus
                             sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts"
