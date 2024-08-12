@@ -46,7 +46,7 @@ pipeline {
                     script {
                         sh "aws eks update-kubeconfig --name ${EKS_NAME}"
                         // Check if ArgoCD namespace exists
-                        def namespaceExists = sh(script: "kubectl get namespace argocd", returnStatus: true) == 0
+                        def namespaceExists = (sh(script: "kubectl get namespace argocd", returnStatus: true) == 0)
                         if (!namespaceExists) {
                             sh "kubectl create namespace argocd"
                             sh "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
