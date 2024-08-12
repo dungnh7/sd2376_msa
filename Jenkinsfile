@@ -99,6 +99,8 @@ pipeline {
                             sh "helm repo update"
                             sh "helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace"
                             // Install Grafana
+                            sh "helm repo add grafana https://grafana.github.io/helm-charts"
+                            sh "helm repo update"
                             sh "helm install grafana grafana/grafana --namespace monitoring --set adminPassword='admin' --set service.type=LoadBalancer"
     
                             //forward
