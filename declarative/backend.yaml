@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/dungnh7/sd2376_msa
     targetRevision: HEAD
-    path: ./src/deployment
+    path: /src/deployment
    
   # Destination cluster and namespace to deploy the application
   destination:
