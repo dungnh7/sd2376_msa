@@ -68,7 +68,7 @@ pipeline {
             steps {
                 withAWS(region: "${REGION}" , credentials: 'aws-credential') {
                     sh "aws eks update-kubeconfig --name ${EKS_NAME}"
-                    def namespaceExists = sh(script: "kubectl get namespace monitoring", returnStatus: true) == 0
+                    def namespaceExists = (sh(script: "kubectl get namespace monitoring", returnStatus: true) == 0)
                     if (!namespaceExists) {
                         // Install Prometheus
                         sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts"
