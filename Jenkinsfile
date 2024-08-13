@@ -33,7 +33,7 @@ pipeline {
                         git config user.name "Jenkins"
                         git add src/deployment/webapi-deployment.yaml
                         git commit -m "Update backend image to ${IMAGE_TAG}" || echo "No changes to commit"
-                        git push origin main || echo "No changes to push"
+                        git push origin/main || echo "No changes to push"
                     """
                 }
             }
