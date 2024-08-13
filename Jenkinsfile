@@ -59,7 +59,7 @@ pipeline {
                                 echo \${PASSWORD_BASE64} | base64 --decode
                             """
                             //forward port
-                            //sh "kubectl port-forward svc/argocd-server -n argocd 8082:443"
+                            sh "kubectl port-forward svc/argocd-server -n argocd 8082:443 &"
                             // Apply ArgoCD application
                             sh "kubectl create namespace app-argocd"
                             sh "kubectl apply -f declarative/backend.yaml"
@@ -104,8 +104,8 @@ pipeline {
                             sh "helm install grafana grafana/grafana --namespace monitoring --set adminPassword='admin' --set service.type=LoadBalancer"
     
                             //forward
-                            sh "kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n monitoring"
-                            sh "kubectl port-forward svc/grafana 3000:3000 -n monitoring"
+                            sh "kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n monitoring &"
+                            sh "kubectl port-forward svc/grafana 3000:3000 -n monitoring &"
                         } else {
                             echo "Prometheus and Grafana is already set up. Skipping one-time setup."
                         }      
