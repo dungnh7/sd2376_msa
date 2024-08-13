@@ -29,11 +29,12 @@ pipeline {
                     // Update the Kubernetes deployment file with the new image tag
                     sh """
                         sed -i 's|image: ${ECR_URI}/${BACKEND_APP}:.*|image: ${ECR_URI}/${BACKEND_APP}:${IMAGE_TAG}|' src/deployment/webapi-deployment.yaml
+                        git init
                         git config user.email "dung.nhd.7@gmail.com"
                         git config user.name "Jenkins"
                         git add src/deployment/webapi-deployment.yaml
                         git commit -m "Update backend image to ${IMAGE_TAG}" || echo "No changes to commit"
-                        git push origin/main || echo "No changes to push"
+                        git push origin main || echo "No changes to push"
                     """
                 }
             }
