@@ -97,16 +97,18 @@ pipeline {
                             }
                             // Install Prometheus
                             sh "helm repo add prometheus-community https://prometheus-community.github.io/helm-charts"
+                            sh "helm repo add stable https://charts.helm.sh/stable"
                             sh "helm repo update"
                             sh "helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace"
-                            // Install Grafana
-                            sh "helm repo add grafana https://grafana.github.io/helm-charts"
-                            sh "helm repo update"
-                            sh "helm install grafana grafana/grafana --namespace monitoring --set adminPassword='admin' --set service.type=LoadBalancer"
+                            sh "kubectl port-forward service/prometheus-grafana 8082:80 &"
+                            // // Install Grafana
+                            // sh "helm repo add grafana https://grafana.github.io/helm-charts"
+                            // sh "helm repo update"
+                            // sh "helm install grafana grafana/grafana --namespace monitoring --set adminPassword='admin' --set service.type=LoadBalancer"
     
-                            //forward
-                            sh "kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n monitoring &"
-                            sh "kubectl port-forward svc/grafana 3000:3000 -n monitoring &"
+                            // //forward
+                            // sh "kubectl port-forward svc/prometheus-kube-prometheus-prometheus 9090:9090 -n monitoring &"
+                            // sh "kubectl port-forward svc/grafana 3000:3000 -n monitoring &"
                         } else {
                             echo "Prometheus and Grafana is already set up. Skipping one-time setup."
                         }      
