@@ -6,7 +6,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: sd2376-practical-devops
+  project: sd2376-argocd-projects
 
   source:
     repoURL: https://github.com/dungnh7/sd2376_msa

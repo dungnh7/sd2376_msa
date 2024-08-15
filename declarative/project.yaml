@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: sd2376-argocd-projects
+  namespace: argocd
+spec:
+  description: sd2376-argocd-projects
+  
+  # Allow all source repositories
+  sourceRepos:
+    - '*'
+  
+  # Allow all destinations
+  destinations:
+    - server: '*'
+      namespace: '*'
+  
+  # Optional: Allow all cluster-scoped resources
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

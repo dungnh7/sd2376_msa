@@ -63,6 +63,7 @@ pipeline {
                             sh "kubectl port-forward svc/argocd-server -n argocd 8082:443 &"
                             // Apply ArgoCD application
                             sh "kubectl create namespace app-argocd"
+                            sh "kubectl apply -f declarative/project.yaml"
                             sh "kubectl apply -f declarative/backend.yaml"
                         } else {
                             echo "ArgoCD is already set up. Skipping one-time setup."
