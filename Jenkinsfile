@@ -60,7 +60,7 @@ pipeline {
                                 echo \${PASSWORD_BASE64} | base64 --decode
                             """
                             //forward port
-                            sh "kubectl port-forward svc/argocd-server -n argocd 8082:443 &"
+                            sh "kubectl port-forward svc/argocd-server -n argocd 8081:443 &"
                             // Apply ArgoCD application
                             def namespaceAppExists = (sh(script: "kubectl get namespace app-argocd", returnStatus: true) == 0)
                             if (!namespaceAppExists) {
