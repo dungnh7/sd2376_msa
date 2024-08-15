@@ -47,24 +47,24 @@ pipeline {
                     script {
                         sh "aws eks update-kubeconfig --name ${EKS_NAME}"
                         // Check if ArgoCD namespace exists
-                        def namespaceExists = (sh(script: "kubectl get namespace argocd1", returnStatus: true) == 0)
+                        def namespaceExists = (sh(script: "kubectl get namespace nameargocd", returnStatus: true) == 0)
                         if (!namespaceExists) {
-                            sh "kubectl create namespace argocd"
+                            sh "kubectl create namespace nameargocd"
                             sh "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
                             // Wait for ArgoCD to be ready
-                            sh "kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n argocd"
+                            sh "kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n nameargocd"
                             // Retrieve and decode the Argo CD admin password
                             sh """
-                                PASSWORD_BASE64=\$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}')
+                                PASSWORD_BASE64=\$(kubectl -n nameargocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}')
                                 echo "Decoding password..."
                                 echo \${PASSWORD_BASE64} | base64 --decode
                             """
                             //forward port
-                            sh "kubectl port-forward svc/argocd-server -n argocd 8081:443 &"
+                            sh "kubectl port-forward svc/argocd-server -n nameargocd 8081:443 &"
                             // Apply ArgoCD application
-                            def namespaceAppExists = (sh(script: "kubectl get namespace app-argocd1", returnStatus: true) == 0)
+                            def namespaceAppExists = (sh(script: "kubectl get namespace app-nameargocd", returnStatus: true) == 0)
                             if (!namespaceAppExists) {
-                                sh "kubectl create namespace app-argocd"
+                                sh "kubectl create namespace app-nameargocd"
                             }
                             sh "kubectl apply -f declarative/project.yaml"
                             sh "kubectl apply -f declarative/backend.yaml"

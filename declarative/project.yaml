@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: sd2376-argocd-projects
-  namespace: argocd
+  namespace: nameargocd
 spec:
   description: sd2376-argocd-projects
   
