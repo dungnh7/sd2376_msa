@@ -47,7 +47,7 @@ pipeline {
                     script {
                         sh "aws eks update-kubeconfig --name ${EKS_NAME}"
                         // Check if ArgoCD namespace exists
-                        def namespaceExists = (sh(script: "kubectl get namespace argocd", returnStatus: true) == 0)
+                        def namespaceExists = (sh(script: "kubectl get namespace argocd1", returnStatus: true) == 0)
                         if (!namespaceExists) {
                             sh "kubectl create namespace argocd"
                             sh "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
@@ -62,7 +62,7 @@ pipeline {
                             //forward port
                             sh "kubectl port-forward svc/argocd-server -n argocd 8081:443 &"
                             // Apply ArgoCD application
-                            def namespaceAppExists = (sh(script: "kubectl get namespace app-argocd", returnStatus: true) == 0)
+                            def namespaceAppExists = (sh(script: "kubectl get namespace app-argocd1", returnStatus: true) == 0)
                             if (!namespaceAppExists) {
                                 sh "kubectl create namespace app-argocd"
                             }
