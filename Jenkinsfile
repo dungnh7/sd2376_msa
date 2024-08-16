@@ -26,18 +26,18 @@ pipeline {
             agent any
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github-auth', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_TOKEN')]) {
-                    git branch: 'main', url: 'https://github.com/dungh7/sd2376_msa.git'
+                    git branch: 'main', url: "https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/sd2376_msa.git"
                     // Update the Kubernetes deployment file with the new image tag
                     sh """
                         git config --global user.email "${GIT_USERNAME}"
                         git config --global user.name "Jenkins"
-                        git clone https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/dungh7/sd2376_msa.git .
+                        git clone https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/sd2376_msa.git .
                         
                         sed -i 's|image: ${ECR_URI}/${BACKEND_APP}:.*|image: ${ECR_URI}/${BACKEND_APP}:${IMAGE_TAG}|' src/deployment/webapi-deployment.yaml
                         
                         git add src/deployment/webapi-deployment.yaml
                         git commit -m "Update backend image to ${IMAGE_TAG}" || echo "No changes to commit"
-                        git push https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/dungh7/sd2376_msa.git
+                        git push https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/sd2376_msa.git
                     """
                 }
             }
