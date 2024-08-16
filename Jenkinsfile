@@ -26,15 +26,18 @@ pipeline {
             agent any
             steps {
                 git branch: 'main', url: 'https://github.com/dungh7/sd2376_msa.git'
-                withAWS(region: "${REGION}", credentials: 'aws-credential') {
+                withCredentials([usernamePassword(credentialsId: 'github-auth', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_TOKEN')]) {
                     // Update the Kubernetes deployment file with the new image tag
                     sh """
+                        git config --global user.email "${GIT_USERNAME}"
+                        git config --global user.name "Jenkins"
+                        git clone https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/dungh7/sd2376_msa.git .
+                        
                         sed -i 's|image: ${ECR_URI}/${BACKEND_APP}:.*|image: ${ECR_URI}/${BACKEND_APP}:${IMAGE_TAG}|' src/deployment/webapi-deployment.yaml
-                        git config user.email "dungnh7@gmail.com"
-                        git config user.name "Dungnh7"
+                        
                         git add src/deployment/webapi-deployment.yaml
                         git commit -m "Update backend image to ${IMAGE_TAG}" || echo "No changes to commit"
-                        git push origin main || echo "No changes to push"
+                        git push https://${GIT_USERNAME}:${GIT_TOKEN}@github.com/dungh7/sd2376_msa.git
                     """
                 }
             }
