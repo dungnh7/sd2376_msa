@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: backend
-  namespace: nameargocd
+  namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -11,12 +11,12 @@ spec:
   source:
     repoURL: https://github.com/dungnh7/sd2376_msa
     targetRevision: HEAD
-    path: /src/deployment
+    path: src/deployment
    
   # Destination cluster and namespace to deploy the application
   destination:
     server: https://kubernetes.default.svc
-    namespace: app-nameargocd
+    namespace: app-argocd
 
   # Sync policy
   syncPolicy:
