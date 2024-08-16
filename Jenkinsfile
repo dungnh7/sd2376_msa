@@ -33,7 +33,7 @@ pipeline {
                         git remote set-url origin https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/sd2376_msa.git
                         git config --global user.email "${GIT_USERNAME}"
                         git config --global user.name "Jenkins"
-                        git pull
+                        git pull origin main
                         git checkout main -f
                         
                         sed -i 's|image: ${ECR_URI}/${BACKEND_APP}:.*|image: ${ECR_URI}/${BACKEND_APP}:${IMAGE_TAG}|' src/deployment/webapi-deployment.yaml
