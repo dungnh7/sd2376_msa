@@ -29,9 +29,13 @@ pipeline {
                     git branch: 'main', url: "https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/sd2376_msa.git"
                     // Update the Kubernetes deployment file with the new image tag
                     sh """
+                        cd /
+                        git init
+                        git remote add origin https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/sd2376_msa.git
                         git config --global user.email "${GIT_USERNAME}"
                         git config --global user.name "Jenkins"
-                        git clone https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/sd2376_msa.git .
+                        git pull
+                        git checkout main -f
                         
                         sed -i 's|image: ${ECR_URI}/${BACKEND_APP}:.*|image: ${ECR_URI}/${BACKEND_APP}:${IMAGE_TAG}|' src/deployment/webapi-deployment.yaml
                         
