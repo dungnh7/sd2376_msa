@@ -25,8 +25,8 @@ pipeline {
         stage('Update Kubernetes Deployment') {
             agent any
             steps {
-                git branch: 'main', url: 'https://github.com/dungh7/sd2376_msa.git'
                 withCredentials([usernamePassword(credentialsId: 'github-auth', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_TOKEN')]) {
+                    git branch: 'main', url: 'https://github.com/dungh7/sd2376_msa.git'
                     // Update the Kubernetes deployment file with the new image tag
                     sh """
                         git config --global user.email "${GIT_USERNAME}"
