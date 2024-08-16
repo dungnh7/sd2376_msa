@@ -29,8 +29,7 @@ pipeline {
                     git branch: 'main', url: "https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/sd2376_msa.git"
                     // Update the Kubernetes deployment file with the new image tag
                     sh """
-                        cd /
-                        git init
+                        git init .
                         git remote add origin https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/sd2376_msa.git
                         git config --global user.email "${GIT_USERNAME}"
                         git config --global user.name "Jenkins"
