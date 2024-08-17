@@ -32,7 +32,7 @@ pipeline {
                         git init .
                         git remote set-url origin https://${GIT_TOKEN}@github.com/${GIT_USERNAME}/sd2376_msa.git
                         git config --global user.email "${GIT_USERNAME}"
-                        git config --global user.name "Jenkins"
+                        git config --global user.name "dungnh7"
                         git pull origin main
                         git checkout main -f
                         
