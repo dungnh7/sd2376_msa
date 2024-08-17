@@ -1,5 +1,8 @@
 # sd2376_msa
 - Webhook
+- Declarative
+    - Create argocd project
+    - Create argocd applications
 - Jenkins:
     - Docker Build and push to ECR
     - Update Kubernetes Deployment // Update the Kubernetes deployment file with the new image tag
