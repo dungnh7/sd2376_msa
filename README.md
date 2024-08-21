@@ -1,5 +1,5 @@
 # sd2376_msa
-- Webhook
+- Using the webhook
 - Declarative
     - Create argocd project
     - Create argocd applications
